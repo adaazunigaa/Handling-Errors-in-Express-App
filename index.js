@@ -25,8 +25,8 @@ const verifyPassword = function (req, res, next){
     if (password === "nugget"){
         next();
     }
-    res.send("sorry, WRONG password");  
-    throw new Error("Password Required");
+    // res.send("sorry, WRONG password");  
+    throw new Error("SECRET ERROR: ->Password Required<-");
 };
 
 
@@ -50,7 +50,11 @@ app.use((req,res) =>{
     res.status(404).send("NOT FOUND");
 });
 
+app.use((err, req, res, next)=>{
+    console.log("***ERROR****");
+    next(err);
 
+} )
 
 app.listen(3000, () =>{
     console.log("App is running on localhost:3000");
