@@ -1,7 +1,9 @@
-const { raw } = require("body-parser");
+// const { raw } = require("body-parser");
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
+
+const AppError = require("./AppError");
 
 
 
@@ -25,8 +27,9 @@ const verifyPassword = function (req, res, next){
     if (password === "nugget"){
         next();
     }
+    throw new AppError("password required to enter the secret page", 401)
     // res.send("sorry, WRONG password");  
-    throw new Error("SECRET ERROR: ->Password Required<-");
+    // throw new AppError("SECRET ERROR: ->Password Required<-", 401);
 };
 
 
@@ -44,17 +47,24 @@ app.get("/secret", verifyPassword, (req,res) => {
     res.send("Hello! this is the secret page!");
 });
 
-
-
-app.use((req,res) =>{
-    res.status(404).send("NOT FOUND");
+app.get("/admin", (req,res) => {
+    throw new AppError("You are not an admin", 403)
 });
 
-app.use((err, req, res, next)=>{
-    console.log("***ERROR****");
-    next(err);
+app.use((req,res) =>{
+    res.status(404).send("PAGE NOT FOUND");
+});
 
-} )
+// app.use((err, req, res, next)=>{
+//     console.log("***ERROR****");
+//     next(err);
+
+// });
+
+app.use((err, req, res, next) => {
+    const { status= 500, message="Something went wrong"} = err;
+    res.status(status).send(message)
+}); 
 
 app.listen(3000, () =>{
     console.log("App is running on localhost:3000");
